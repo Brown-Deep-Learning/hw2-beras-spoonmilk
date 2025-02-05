@@ -29,7 +29,11 @@ class Tensor(np.ndarray):
 """
 Mimics the tf.Variable class.
 """
-Variable = Tensor
+
+class Variable(Tensor):
+
+    def assign(self, value: Union[Tensor, np.ndarray]):
+        self[:] = value
 
 
 class Callable(ABC):
