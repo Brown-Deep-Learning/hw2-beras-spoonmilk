@@ -169,3 +169,9 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# LaTeX files (non-pdf)
+conceptual/beras-conceptual.aux
+conceptual/beras-conceptual.fdb_latexmk
+conceptual/beras-conceptual.fls
+conceptual/beras-conceptual.synctex.gz
