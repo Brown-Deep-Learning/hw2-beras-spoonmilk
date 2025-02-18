@@ -21,7 +21,9 @@ class LeakyReLU(Activation):
 
     def forward(self, x) -> Tensor:
         """Leaky ReLu forward propagation!"""
-        return NotImplementedError
+        # This is disgusting and bad and I hate python
+        inputarr = np.where(x > 0, x, self.alpha * x)
+        return Tensor(inputarr)
 
     def get_input_gradients(self) -> list[Tensor]:
         """
@@ -29,7 +31,8 @@ class LeakyReLU(Activation):
         To see what methods/variables you have access to, refer to the cheat sheet.
         Hint: Make sure not to mutate any instance variables. Return a new list[tensor(s)]
         """
-        raise NotImplementedError
+        inputarr = np.where(self.inputs > 0, 1, self.alpha) 
+        return [Tensor(inputarr)]
 
     def compose_input_gradients(self, J):
         return self.get_input_gradients()[0] * J
@@ -44,18 +47,21 @@ class ReLU(LeakyReLU):
 ## Output Activations For Probability-Space Outputs
 
 class Sigmoid(Activation):
-    
+
     ## TODO: Implement for default output activation to bind output to 0-1
-    
+
     def forward(self, x) -> Tensor:
-        raise NotImplementedError
+        return 1 / (1 + np.exp(-x))
 
     def get_input_gradients(self) -> list[Tensor]:
         """
         To see what methods/variables you have access to, refer to the cheat sheet.
         Hint: Make sure not to mutate any instance variables. Return a new list[tensor(s)]
         """
-        raise NotImplementedError
+        def sigmoid(x) -> Tensor:
+            return 1 / (1 + np.exp(-x))
+        
+        return sigmoid(self.inputs) * (1 - sigmoid(self.inputs))
 
     def compose_input_gradients(self, J):
         return self.get_input_gradients()[0] * J
@@ -74,9 +80,11 @@ class Softmax(Activation):
 
         ## HINT: Use stable softmax, which subtracts maximum from
         ## all entries to prevent overflow/underflow issues
-        raise NotImplementedError
-
-    def get_input_gradients(self):
+        max_x = np.max(x)
+        exps = np.exp(x - max_x)
+        return exps / np.sum(exps, axis=-1, keepdims=True)
+ 
+    def get_input_gradients(self) -> list[Tensor]:
         """Softmax input gradients!"""
         x, y = self.inputs + self.outputs
         bn, n = x.shape

@@ -18,13 +18,15 @@ class Dense(Diffable):
         """
         Forward pass for a dense layer! Refer to lecture slides for how this is computed.
         """
-        return NotImplementedError
+        return np.dot(self.w * x) + self.b 
 
     def get_input_gradients(self) -> list[Tensor]:
-        return NotImplementedError
+        return [self.w.T]
 
     def get_weight_gradients(self) -> list[Tensor]:
-        return NotImplementedError
+        dW = self.inputs.T
+        db = np.ones_like(self.bias) 
+        return [dW, db]
 
     @staticmethod
     def _initialize_weight(initializer, input_size, output_size) -> tuple[Variable, Variable]:
@@ -45,6 +47,8 @@ class Dense(Diffable):
             with ReLU activation.
         """
 
+        # I hate python
+
         initializer = initializer.lower()
         assert initializer in (
             "zero",
@@ -52,5 +56,31 @@ class Dense(Diffable):
             "xavier",
             "kaiming",
         ), f"Unknown dense weight initialization strategy '{initializer}' requested"
+
+        match initializer:
+            case "zero":
+                weights: Variable = np.zeros((input_size, output_size))
+                biases = np.zeros((output_size,))
+                return weights, biases 
+
+            case "normal":
+                weights: Variable = np.random.normal(loc=0.0, scale=1.0, shape=(input_size, output_size))
+                biases = np.zeros((output_size,))
+                return weights, biases 
+                 
+            case "xavier":
+                stddev = np.sqrt(2 / (input_size + output_size))  
+                weights: Variable = np.random.normal(0.0, stddev, shape=(input_size, output_size))
+                biases = np.zeros((output_size,))
+                return weights, biases 
+            
+            case "kaiming": 
+                stddev = np.sqrt(2 / input_size)  
+                weights: Variable = np.random.normal(0.0, stddev, shape=(input_size, output_size))
+                biases = np.zeros((output_size,))
+                return weights, biases 
+            
+            case _:
+                KeyError
 
         return None, None
