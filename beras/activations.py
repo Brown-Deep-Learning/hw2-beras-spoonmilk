@@ -51,7 +51,7 @@ class Sigmoid(Activation):
     ## TODO: Implement for default output activation to bind output to 0-1
 
     def forward(self, x) -> Tensor:
-        return 1 / (1 + np.exp(-x))
+        return Tensor(1 / (1 + np.exp(-x)))
 
     def get_input_gradients(self) -> list[Tensor]:
         """
@@ -61,7 +61,7 @@ class Sigmoid(Activation):
         def sigmoid(x) -> Tensor:
             return 1 / (1 + np.exp(-x))
         
-        return sigmoid(self.inputs) * (1 - sigmoid(self.inputs))
+        return [sigmoid(self.inputs) * (1 - sigmoid(self.inputs))]
 
     def compose_input_gradients(self, J):
         return self.get_input_gradients()[0] * J
@@ -82,7 +82,7 @@ class Softmax(Activation):
         ## all entries to prevent overflow/underflow issues
         max_x = np.max(x)
         exps = np.exp(x - max_x)
-        return exps / np.sum(exps, axis=-1, keepdims=True)
+        return Tensor(exps / np.sum(exps, axis=-1, keepdims=True))
  
     def get_input_gradients(self) -> list[Tensor]:
         """Softmax input gradients!"""
@@ -91,4 +91,15 @@ class Softmax(Activation):
         grad = np.zeros(shape=(bn, n, n), dtype=x.dtype)
         
         # TODO: Implement softmax gradient
-        raise NotImplementedError
+        for i in range(bn):
+            for j in range(n):
+                for k in range(n):
+                    if j == k:
+                        grad[i, j, k] = y[i, j] * (1 - y[i, j])
+                    else:
+                        grad[i, j, k] = -y[i, j] * y[i, k]
+
+        return [Tensor(grad)]
+
+    def compose_input_gradients(self, J):
+        return np.einsum("ij,ijk->ik", J, self.get_input_gradients()[0])

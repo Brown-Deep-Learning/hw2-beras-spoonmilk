@@ -3,7 +3,9 @@ import numpy as np
 from typing import Literal
 from beras.core import Diffable, Variable, Tensor
 
-DENSE_INITIALIZERS = Literal["zero", "normal", "xavier", "kaiming", "xavier uniform", "kaiming uniform"]
+DENSE_INITIALIZERS = Literal["zero", "normal", "xavier",
+                             "kaiming", "xavier uniform", "kaiming uniform"]
+
 
 class Dense(Diffable):
 
@@ -12,21 +14,21 @@ class Dense(Diffable):
 
     @property
     def weights(self) -> list[Tensor]:
-        return self.w, self.b
+        return [self.w, self.b]
 
     def forward(self, x: Tensor) -> Tensor:
         """
         Forward pass for a dense layer! Refer to lecture slides for how this is computed.
         """
-        return np.dot(self.w * x) + self.b 
+        return np.dot(self.w, x) + self.b
 
     def get_input_gradients(self) -> list[Tensor]:
         return [self.w.T]
 
     def get_weight_gradients(self) -> list[Tensor]:
-        dW = self.inputs.T
-        db = np.ones_like(self.bias) 
-        return [dW, db]
+        d_W = self.inputs[0].T
+        d_b = np.ones_like(self.b)
+        return [d_W, d_b]
 
     @staticmethod
     def _initialize_weight(initializer, input_size, output_size) -> tuple[Variable, Variable]:
@@ -61,25 +63,26 @@ class Dense(Diffable):
             case "zero":
                 weights: Variable = np.zeros((input_size, output_size))
                 biases = np.zeros((output_size,))
-                return weights, biases 
+                return weights, biases
 
             case "normal":
-                weights: Variable = np.random.normal(loc=0.0, scale=1.0, shape=(input_size, output_size))
+                weights: Variable = np.random.normal(
+                    loc=0.0, scale=1.0, shape=(input_size, output_size))
                 biases = np.zeros((output_size,))
-                return weights, biases 
-                 
+                return weights, biases
+
             case "xavier":
-                stddev = np.sqrt(2 / (input_size + output_size))  
+                stddev = np.sqrt(2 / (input_size + output_size))
                 weights: Variable = np.random.normal(0.0, stddev, shape=(input_size, output_size))
                 biases = np.zeros((output_size,))
-                return weights, biases 
-            
-            case "kaiming": 
-                stddev = np.sqrt(2 / input_size)  
+                return weights, biases
+
+            case "kaiming":
+                stddev = np.sqrt(2 / input_size)
                 weights: Variable = np.random.normal(0.0, stddev, shape=(input_size, output_size))
                 biases = np.zeros((output_size,))
-                return weights, biases 
-            
+                return weights, biases
+
             case _:
                 KeyError
 

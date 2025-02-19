@@ -31,129 +31,172 @@
 
 % Names + Dates!
 \newcommand{\myname}{Alexander Khosrowshahi}
-\newcommand{\assignment}{Homework X}
-\newcommand{\duedate}{Month, Day, Year}
+\newcommand{\assignment}{Beras: Conceptual}
+\newcommand{\duedate}{February 18, 2025}
 
 \begin{document}
 
 \textbf{Brown University}\hfill\textbf{\myname}\\[0.01in]
-\textbf{Course Code -- Course Name}\hfill\textbf{\assignment}\\[0.01in]
-\textbf{Prof.\ Professorson}\hfill\textbf{\duedate}\\
+\textbf{CSCI1470}\hfill\textbf{\assignment}\\[0.01in]
+\textbf{Prof.\ Ewing}\hfill\textbf{\duedate}\\
 \smallskip\hrule\bigskip
 
-\section*{Conceptual Questions}
+\section{Conceptual Questions}
 
 \begin{questions}
 
-	\question
-	The update rule for weights in a single layer, multi-class neural network with cross entropy loss is defined as follows:
+	\question The update rule for weights in a single-layer, multi-class neural network with cross-entropy loss is defined as follows:
 
-	Let $w_{ij}$ be the weight associating the $i$th input feature $x_i$ with the $j$th class. Let $c$ be the index of the correct class for a given input (the {\it label}). The loss and its derivatives are then:
+	Let \( w_{ij} \) be the weight associating the \( i \)th input feature \( x_i \) with the \( j \)th class. Let \( c \) be the index of the correct class for a given input (the \textit{label}). The loss and its derivatives are then:
 
-	$$L = -\log(P_c), \ \ \ \ \ \frac{\partial L}{\partial w_{ij}} = \begin{cases}
-			(P_j - 1)x_i & j = c    \\
-			P_j x_i      & j \neq c
-		\end{cases}$$
-	We use these partials with a learning rate $\alpha$ to descend along the gradient:
-	$$w_{ij} = w_{ij} - \frac{\partial L}{\partial w_{ij}}\alpha$$
+	\[
+		L = -\log(P_c), \quad \frac{\partial L}{\partial w_{ij}} =
+		\begin{cases}
+			(P_j - 1)x_i, & j = c    \\
+			P_j x_i,      & j \neq c
+		\end{cases}
+	\]
+
+	We use these partials with a learning rate \( \alpha \) to descend along the gradient:
+
+	\[
+		w_{ij} = w_{ij} - \alpha \frac{\partial L}{\partial w_{ij}}
+	\]
 
 	Derive the above rules from the original definition of cross-entropy loss.
 
+	\begin{solution}
+		We begin by expanding the definition of cross-entropy loss considering a situation where \(j \neq c\).
+
+		Cross-entropy is defined as \( L = -\sum_{j} y_j \log(P_j) \), where \( y_j \) is the true probability of class \( j \) and \( P_j \) is the predicted probability of class \( j \).
+
+		In our case, y is a one-hot vector with \( y_c = 1 \) and \( y_j = 0 \) for \( j \neq c \). Thus, the loss simplifies to \( L = -\log(P_c) \).
+
+		Assuming we use softmax as our activation function, the logit for class j is \( z_j = \mathbf{w}_j \cdot \mathbf{x} \). The probability of class j is then
+		\[ P_j = \frac{e^{z_j}}{\sum_{k} e^{z_k}} \]
+
+		Now we can take the derivative with respect to the logit
+		\[ \frac{\partial L}{\partial z_j} = \frac{\partial L}{\partial P_c} \frac{\partial P_c}{\partial z_j} \]
+
+		\[ \frac{\partial L}{\partial z_j} = -\frac{1}{P_c} \frac{\partial P_c}{\partial z_j} \]
+
+		\[ \frac{\partial L}{\partial z_j} = -\frac{1}{P_c} \left( \frac{\partial}{\partial z_j} \left( \frac{e^{z_c}}{\sum_{k} e^{z_k}} \right) \right) \]
+
+		Which we now split into the cases where \( j = c \) and \( j \neq c \).
+
+		When \( j = c \), we have
+		\[
+			\frac{\partial P_c}{\partial z_c} = \frac{e^{z_c} \sum_{k} e^{z_k} - e^{z_c} e^{z_c}}{\left( \sum_{k} e^{z_k} \right)^2} = P_c(1 - P_c)
+		\]
+
+		and when \( j \neq c \), we have
+
+		\[
+			\frac{\partial P_c}{\partial z_j} = \frac{-e^{z_c} e^{z_j}}{\left( \sum_{k} e^{z_k} \right)^2} = -P_c P_j
+		\]
+
+		Giving us our original rules for the derivative of the loss with respect to the logit. By definition, we can use these to descend the gradient as stated.
+
+	\end{solution}
+
+	\question In classification problems, we assign a likelihood probability to each class and use a loss function that outputs a loss based on this probability. Can you use MSE loss for classification tasks? Why or why not? Why is cross-entropy loss most commonly used for classification? (3-5 sentences)
+
 	\begin{quote}
-		{\bf Hint:} Consider both cases of $j$, and start by expanding out $L$.
+		\textbf{Hint:} Think about how each loss function is shaped, the inputs they take, and their range.
 	\end{quote}
 
-	\question
-	In classification problems, we assign a likelihood probability to each class and use a loss function that outputs a loss based on this probability. Can you use MSE loss for classification tasks? Why or why not? Why is cross-entropy loss most commonly used for classification? (3-5 sentences)
+	\newpage
 
-	\begin{quote}
-		{\bf Hint:} Think about how each loss function is shaped, the inputs that they take in, and the range of each function's inputs.
-	\end{quote}
+	\question Gradient Descent
 
-	\newpage % just for from-scratch aesthetics. Feel free to remove
+	\begin{parts}
+		\part What is a gradient? How is it different from a partial derivative? How do they relate? (\textit{2-4 sentences})
+		\begin{solution}
+			The gradient is a vector that describes the direction of steepest ascent of a function. It is composed of the partial derivatives of the function with respect to each of its variables. The partial derivative of a function is the derivative of the function with respect to one of its variables, holding all other variables constant. The gradient is a generalization of tderivative as a vector-valued function of the partial derivatives.
+		\end{solution}
 
-	\question
-	In lecture, you learned about gradient descent. What is a gradient? How is it different from a partial derivative? How do they relate? ({\it 2-4 sentences})
 
-	\question
-	Consider the formula for updating our weights:
-	$$\Delta w = -\alpha \frac{\partial L}{\partial w}$$
-	Why do we negate this quantity? What purpose does this serve? ({\it 2-4 sentences})
+		\part Consider the formula for updating our weights:
+		\[
+			\Delta w = -\alpha \frac{\partial L}{\partial w}
+		\]
+		Why do we negate this quantity? What purpose does this serve? (\textit{2-4 sentences})
 
-	\question
-	During gradient descent, we calculate the partial derivative of loss ($L$) with respect to each weight $(w_{ij})$. Why must we do this for every weight? Why can't we do this for some weights? ({\it 1-3 sentences})
+		\begin{solution}
+			Our goal with gradient descent is to \textit{minimize} the loss function. The gradient points in the direction of steepest ascent, so we negate it to move in the direction of steepest \textit{descent}. This allows us to iteratively update our weights to minimize the loss function.
+		\end{solution}
 
-	\question
-	In practice, most operations during gradient descent are vectorized. Why do we do this? Why might this make it beneficial to train the model on a GPU? ({\it 1-2 sentences})
+		\part During gradient descent, we calculate the partial derivative of loss \( L \) with respect to each weight \( w_{ij} \). Why must we do this for every weight? Why can't we do this for some weights? (\textit{1-3 sentences})
 
-	\question
-	Consider the following plot of a loss function for some neural network:
-	\begin{figure}[H]
-		\caption{Loss Manifold Visualization}
-		\centering
-		\includegraphics[width=0.7\linewidth]{./images/hw2-loss.png}
-		\label{fig:label}
-	\end{figure}
-	Where should gradient descent end up on the graph? How many weights does this model have? If our model starts training at $(-2, 2, 0)$, will the loss function ever reach the absolute minimum? Why? Assume the loss function at this point is {\it perfectly flat}. ({\it 3-5 sentences})
+		\begin{solution}
+			We reasonably \textit{could} compute the partial derivative of the loss with respect to a subset of the weights, however each weight contributes to each output. If we want to minimize the loss function, we must consider the effect of each weight on the output. Thus, we must compute the partial derivative of the loss with respect to each weight.
+		\end{solution}
+
+		\part In practice, most operations during gradient descent are vectorized. Why do we do this? Why might this make it beneficial to train the model on a GPU? (\textit{1-2 sentences})
+
+		\begin{solution}
+			To put it simply, we vectorize our operations to correspond to the structure of such equations---vectors. Given the efficacy of GPUs of working on many parallel operations at once, it makes sense to parallelize as much as possible to speed up training.
+		\end{solution}
+
+		\part Consider the following plot of a loss function for some neural network:
+		\begin{figure}[htbp]
+			\centering
+			\includegraphics[width=0.7\linewidth]{./images/hw2-loss.png}
+			\caption{Loss Manifold Visualization}
+		\end{figure}
+		Where should gradient descent end up on the graph? How many weights does this model have? If our model starts training at \( (-2, 2, 0) \), will the loss function ever reach the absolute minimum? Why? Assume the loss function at this point is \textit{perfectly flat}. (\textit{3-5 sentences})
+	\end{parts}
+
+	\newpage
+
+	\question We have previously worked on single-layer linear regression using one linear function:
+	\[
+		\mathbf{x} \mapsto \mathbf{W}_1 \mathbf{x} + \mathbf{b}_1
+	\]
+	mapping from \( \mathbb{R}^s \) to \( \mathbb{R}^t \). For many real-world scenarios, we actually need multiple layers to model more complex relationships.
+
+	\begin{parts}
+		\part Calculate the result after we stack another linear function
+		\[
+			\mathbf{x} \mapsto \mathbf{W}_2 \mathbf{x} + \mathbf{b}_2
+		\]
+		mapping from \( \mathbb{R}^t \) to \( \mathbb{R}^u \) right after the first one.
+
+		\part What is the shape of \( \mathbf{W}_1, \mathbf{b}_1 \) and \( \mathbf{W}_2, \mathbf{b}_2 \)? Explain your reasoning.
+
+		\part Does the composition of the two linear functions offer an improvement over a single linear function? Explain your answer (\textit{2-4 sentences}).
+	\end{parts}
 
 \end{questions}
 
-\newpage % just for from-scratch aesthetics. Feel free to remove
-
-\section{Bonus Questions}
-
-\begin{figure}[H]
-	\caption{Sample Neural Network}
-	\centering
-	\includegraphics[width=0.7\linewidth]{./images/hw2-fit.png}
-	\label{fig:label}
-\end{figure}
-
-For the following questions, the answers will have to do with the following four functions: \textit{get$\_$input$\_$gradients()}, \textit{get$\_$weight$\_$gradients()}, \textit{compose$\_$input$\_$gradients()}, and \textit{compose$\_$weight$\_$gradients()}. Note that through the Diffable class, each of the layers shown above ($f\_1$, $f\_2$, $L$)  either individually  implement or inherit these functions.
-
-\begin{questions}
-	\question
-	To initialize backpropagation, which function must you call on which layer? What partial derivative(s) would this return? (Hint: Think back to HW1)
-
-	\question
-	At layer $f_1$, what shape are the partials that `get$\_$input$\_$gradients(J)` and `get$\_$weight$\_$gradients(J) `return? Imagine that x is a vector of length $m$ and that $w_1$ is a weight matrix of size $(m, r)$. `J` will be the correct upstream gradient. (Hint: Think back to HW1)
-
-	\question
-	At layer $f_1$, what shape are the partials that `compose$\_$input$\_$gradients(J)` and `compose$\_$weight$\_$gradients(J)` return? For this to occur, how must each function resolve the input dimension? What upstream partial is necessary for these functions?
-
-	\question
-	At layer $f_1$, how does `compose$\_$input$\_$gradients(J)`,  resolve the input dimension difference? More specifically, how does this function create a gradient the same shape as the inputs to this layer $(N,m)$? Be sure to reference the matrix multiplication at line 200 in `core.py`. Imagine that $w_2$ is a weight matrix of size $(r,1)$.
-
-\end{questions}
-
-\section*{More Bonus (More math)}
-
-\begin{questions}
-	\question
-	In your introductory calculus class, you were likely exposed to the following simple algorithm for finding the minimum of a function: take the derivative of the function, set it to zero, then solve the equation.
-
-	Neural networks are differentiable, so why don't we use this algorithm (instead of gradient descent) to minimize the loss? ({\it 1-4 sentences})
-
-	\question
-	Prove that SGD with batch size of 1 gives an {\it unbiased estimate} of the "true gradient" (the gradient calculated over the entire training set). Assume that the batch is selected uniform-randomly from the full training set.
-
-	\begin{quote}
-		{\bf Hints:}
-		\begin{enumerate}
-			\item Recall that an estimator $\hat{f}$ is an unbiased estimator of a function $f$ if $\mathbb {E}[\hat f] = f$.
-
-			\item Both expectation and differentiation are linear operators.
-		\end{enumerate}
-	\end{quote}
-
-	In the assignment, you will see that even a single-layer neural network can classify the digit with pretty good accuracy. Still, there are several ways in which one could improve the accuracy of the model. The paper in the link below suggests and easy way to increase the performance without changing the architecture of our network: training several identical models! Please read the following paper (found here) and answer the following questions:
-
-	\question
-	What is the committee? Why would it help increase the performance of the model?
-
-	\question
-	What is the preprocessing they implement in this paper? How does this preprocessing prevent the models' errors from being strongly correlated?
-
-\end{questions}
-
+% \section{Bonus Questions}
+% 
+% \begin{figure}[htbp]
+% 	\centering
+% 	\includegraphics[width=0.7\linewidth]{./images/sample-net.png}
+% 	\caption{Sample Neural Network}
+% \end{figure}
+% 
+% For the following questions, consider the functions:
+% \texttt{get\_input\_gradients()}, \texttt{get\_weight\_gradients()}, \texttt{compose\_input\_gradients()}, and \texttt{compose\_weight\_gradients()}.
+% 
+% \begin{questions}
+% 	\question To initialize backpropagation, which function must you call on which layer? What partial derivative(s) would this return?
+% 
+% 	\question At layer \( f_1 \), what shape are the partials that \texttt{get\_input\_gradients(J)} and \texttt{get\_weight\_gradients(J)} return? Assume \( x \) is a vector of length \( m \) and \( w_1 \) is of size \( (m, r) \).
+% 
+% 	\question At layer \( f_1 \), what shape are the partials that \texttt{compose\_input\_gradients(J)} and \texttt{compose\_weight\_gradients(J)} return?
+% 
+% 	\question At layer \( f_1 \), how does \texttt{compose\_input\_gradients(J)} resolve the input dimension difference?
+% \end{questions}
+% 
+% \section*{More Bonus (More Math)}
+% 
+% \begin{questions}
+% 	\question Why don’t we use symbolic differentiation instead of gradient descent to minimize loss? (\textit{1-4 sentences})
+% 
+% 	\question Prove that SGD with batch size 1 gives an \textit{unbiased estimate} of the full-batch gradient.
+% 
+% \end{questions}
+% 
 \end{document}
