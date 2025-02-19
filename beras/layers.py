@@ -30,11 +30,11 @@ class Dense(Diffable):
     def get_weight_gradients(self) -> list[Tensor]:
         inputs = self.inputs[0]
 
-        d_output = self.get_input_gradients()
+        grad_output = self.get_input_gradients()
 
-        d_W = inputs @ d_output[0]
-        d_b = np.ones_like(self.b)
-        return [Tensor(d_W), Tensor(d_b)]
+        grad_weights = np.dot(inputs, grad_output[0])
+        bias = np.ones_like(self.b)
+        return [Tensor(grad_weights), Tensor(bias)]
 
     @staticmethod
     def _initialize_weight(initializer, input_size, output_size) -> tuple[Variable, Variable]:
@@ -65,31 +65,28 @@ class Dense(Diffable):
             "kaiming",
         ), f"Unknown dense weight initialization strategy '{initializer}' requested"
 
+        # We always initialize the biases to zero
+        biases = Variable(np.zeros((output_size,)))
+
         match initializer:
             case "zero":
-                weights: Variable = np.zeros((input_size, output_size))
-                biases = np.zeros((output_size,))
+                weights: Variable = Variable(np.zeros((input_size, output_size)))
                 return weights, biases
 
             case "normal":
-                weights: Variable = np.random.normal(
-                    loc=0.0, scale=1.0, size=(input_size, output_size))
-                biases = np.zeros((output_size,))
+                weights: Variable = Variable(np.random.normal(
+                    loc=0.0, scale=1.0, size=(input_size, output_size)))
                 return weights, biases
 
             case "xavier":
                 stddev = np.sqrt(2 / (input_size + output_size))
-                weights: Variable = np.random.normal(0.0, stddev, size=(input_size, output_size))
-                biases = np.zeros((output_size,))
+                weights: Variable = Variable(np.random.normal(0.0, stddev, size=(input_size, output_size)))
                 return weights, biases
 
             case "kaiming":
                 stddev = np.sqrt(2 / input_size)
-                weights: Variable = np.random.normal(0.0, stddev, size=(input_size, output_size))
-                biases = np.zeros((output_size,))
+                weights: Variable = Variable(np.random.normal(0.0, stddev, size=(input_size, output_size)))
                 return weights, biases
 
             case _:
                 raise KeyError(f"Unknown initializer: {initializer}")
-
-        return None, None
