@@ -25,7 +25,7 @@ class Dense(Diffable):
 
     def get_input_gradients(self) -> list[Tensor]:
         weights = self.weights[0]
-        return [Tensor(weights.T)]
+        return [Tensor(weights)]
 
     def get_weight_gradients(self) -> list[Tensor]:
         inputs = self.inputs[0]
