@@ -20,13 +20,19 @@ class Dense(Diffable):
         """
         Forward pass for a dense layer! Refer to lecture slides for how this is computed.
         """
-        return np.dot(x, self.w) + self.b
+        weights, biases = self.weights
+        return np.dot(x, weights) + biases
 
     def get_input_gradients(self) -> list[Tensor]:
-        return [self.w.T]
+        weights = self.weights[0]
+        return [weights.T]
 
     def get_weight_gradients(self) -> list[Tensor]:
-        d_W = self.inputs[0].T
+        inputs = self.inputs[0]
+
+        d_output = self.get_input_gradients()
+
+        d_W = inputs @ d_output[0]
         d_b = np.ones_like(self.b)
         return [d_W, d_b]
 
