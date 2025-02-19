@@ -30,7 +30,7 @@
 %% MACRO DEFINITIONS %%
 
 % Names + Dates!
-\newcommand{\myname}{Alexander Khosrowshahi}
+\newcommand{\myname}{Anonymous Learner}
 \newcommand{\assignment}{Beras: Conceptual}
 \newcommand{\duedate}{February 18, 2025}
 
@@ -105,12 +105,18 @@
 		\textbf{Hint:} Think about how each loss function is shaped, the inputs they take, and their range.
 	\end{quote}
 
+	\begin{solution}
+		MSE loss is, fundamentally, a loss function designed for \textit{continuous} outputs. It measures the squared difference between the predicted and true values. In classification tasks, we are dealing with \textit{discrete} outputs, where the output is a probability distribution over classes. MSE loss is not well-suited for classification tasks because it does not capture the probabilistic nature of the problem. Cross-entropy loss, on the other hand, is designed to measure the difference between two probability distributions, making it a more natural choice for classification tasks.
+
+	\end{solution}
+
 	\newpage
 
 	\question Gradient Descent
 
 	\begin{parts}
 		\part What is a gradient? How is it different from a partial derivative? How do they relate? (\textit{2-4 sentences})
+
 		\begin{solution}
 			The gradient is a vector that describes the direction of steepest ascent of a function. It is composed of the partial derivatives of the function with respect to each of its variables. The partial derivative of a function is the derivative of the function with respect to one of its variables, holding all other variables constant. The gradient is a generalization of tderivative as a vector-valued function of the partial derivatives.
 		\end{solution}
@@ -135,8 +141,10 @@
 		\part In practice, most operations during gradient descent are vectorized. Why do we do this? Why might this make it beneficial to train the model on a GPU? (\textit{1-2 sentences})
 
 		\begin{solution}
-			To put it simply, we vectorize our operations to correspond to the structure of such equations---vectors. Given the efficacy of GPUs of working on many parallel operations at once, it makes sense to parallelize as much as possible to speed up training.
+			Vectorizing operations allows us to parallelize otherwise linear computations, which is especially vital in neural networks that may have millions of weights. Training on a GPU is beneficial because GPUs are optimized for parallel computation, allowing us to perform these operations much faster than on a CPU, which has fewer cores and ALUs.
 		\end{solution}
+
+		\newpage
 
 		\part Consider the following plot of a loss function for some neural network:
 		\begin{figure}[htbp]
@@ -144,7 +152,18 @@
 			\includegraphics[width=0.7\linewidth]{./images/hw2-loss.png}
 			\caption{Loss Manifold Visualization}
 		\end{figure}
+
 		Where should gradient descent end up on the graph? How many weights does this model have? If our model starts training at \( (-2, 2, 0) \), will the loss function ever reach the absolute minimum? Why? Assume the loss function at this point is \textit{perfectly flat}. (\textit{3-5 sentences})
+
+		\vspace{0.5cm}
+
+		\begin{solution}
+			\begin{parts}
+				\part Gradient descent should end up at the minimum of the graph, namely at the large hole around 0.7 on x and y.
+				\part Assuming the model has no hidden layers, the model has 2 weights corresponding to the two independent variables in the graph.
+				\part If the loss function is perfectly flat at \( (-2, 2, 0) \), the model will not reach the absolute minimum. This is because the gradient at this point is zero, giving no information on how to update the weights. The model will be stuck at this point indefinitely. This problem is with flat gradients is called the \textit{vanishing gradient problem}.
+			\end{parts}
+		\end{solution}
 	\end{parts}
 
 	\newpage
@@ -162,9 +181,34 @@
 		\]
 		mapping from \( \mathbb{R}^t \) to \( \mathbb{R}^u \) right after the first one.
 
+		\begin{solution}
+			We can represent the composition of the two linear functions as
+			\[
+				\mathbf{x} \mapsto \mathbf{W}_2 (\mathbf{W}_1 \mathbf{x} + \mathbf{b}_1) + \mathbf{b}_2
+			\]
+
+			Expanding this, we get
+			\[
+				\mathbf{W}_2 \mathbf{W}_1 \mathbf{x} + \mathbf{W}_2 \mathbf{b}_1 + \mathbf{b}_2
+			\]
+
+			Thus, the result of stacking the two linear functions is
+			\[
+				\mathbf{W}_2 \mathbf{W}_1 \mathbf{x} + \mathbf{W}_2 \mathbf{b}_1 + \mathbf{b}_2
+			\]
+		\end{solution}
+
 		\part What is the shape of \( \mathbf{W}_1, \mathbf{b}_1 \) and \( \mathbf{W}_2, \mathbf{b}_2 \)? Explain your reasoning.
 
+		\begin{solution}
+			The weights of an MLP layer are a matrix, while biases are column vectors. Following from this, if the first layer maps from \( \mathbb{R}^s \) to \( \mathbb{R}^t \), then \( \mathbf{W}_1 \) is of size \( (t, s) \) and \( \mathbf{b}_1 \) is of size \( (t, 1) \). Similarly, if the second layer maps from \( \mathbb{R}^t \) to \( \mathbb{R}^u \), then \( \mathbf{W}_2 \) is of size \( (u, t) \) and \( \mathbf{b}_2 \) is of size \( (u, 1) \).
+		\end{solution}
 		\part Does the composition of the two linear functions offer an improvement over a single linear function? Explain your answer (\textit{2-4 sentences}).
+		\begin{solution}
+			The composition of two linear functions does not offer an improvement over a single linear function, as the composition of linear functions in an ideal mathematical framework reduces to a single linear function. This is why we apply nonlinear activation functions to the output of each layer in a neural network in order to achieve higher expressiveness and describe complex systems.
+			If we feel like being pedantic, we could say that the composition of two linear functions in a computationally imperfect system does offer more expressiveness due to IEEE error, but I prefer to leave that noise to the \hyperlink{http://tom7.org/grad/murphy2023grad.pdf}{PHDs}.
+
+		\end{solution}
 	\end{parts}
 
 \end{questions}
