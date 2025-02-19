@@ -20,7 +20,7 @@ class Dense(Diffable):
         """
         Forward pass for a dense layer! Refer to lecture slides for how this is computed.
         """
-        return np.dot(self.w, x) + self.b
+        return np.dot(x, self.w) + self.b
 
     def get_input_gradients(self) -> list[Tensor]:
         return [self.w.T]
@@ -84,6 +84,6 @@ class Dense(Diffable):
                 return weights, biases
 
             case _:
-                KeyError
+                raise KeyError(f"Unknown initializer: {initializer}")
 
         return None, None
