@@ -67,19 +67,19 @@ class Dense(Diffable):
 
             case "normal":
                 weights: Variable = np.random.normal(
-                    loc=0.0, scale=1.0, shape=(input_size, output_size))
+                    loc=0.0, scale=1.0, size=(input_size, output_size))
                 biases = np.zeros((output_size,))
                 return weights, biases
 
             case "xavier":
                 stddev = np.sqrt(2 / (input_size + output_size))
-                weights: Variable = np.random.normal(0.0, stddev, shape=(input_size, output_size))
+                weights: Variable = np.random.normal(0.0, stddev, size=(input_size, output_size))
                 biases = np.zeros((output_size,))
                 return weights, biases
 
             case "kaiming":
                 stddev = np.sqrt(2 / input_size)
-                weights: Variable = np.random.normal(0.0, stddev, shape=(input_size, output_size))
+                weights: Variable = np.random.normal(0.0, stddev, size=(input_size, output_size))
                 biases = np.zeros((output_size,))
                 return weights, biases
 
