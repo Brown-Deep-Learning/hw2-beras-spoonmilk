@@ -25,7 +25,7 @@ class Dense(Diffable):
 
     def get_input_gradients(self) -> list[Tensor]:
         weights = self.weights[0]
-        return [weights.T]
+        return [Tensor(weights.T)]
 
     def get_weight_gradients(self) -> list[Tensor]:
         inputs = self.inputs[0]
@@ -34,7 +34,7 @@ class Dense(Diffable):
 
         d_W = inputs @ d_output[0]
         d_b = np.ones_like(self.b)
-        return [d_W, d_b]
+        return [Tensor(d_W), Tensor(d_b)]
 
     @staticmethod
     def _initialize_weight(initializer, input_size, output_size) -> tuple[Variable, Variable]:
