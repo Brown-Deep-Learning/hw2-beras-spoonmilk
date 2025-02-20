@@ -18,7 +18,8 @@ class Dense(Diffable):
 
     def forward(self, x: Tensor) -> Tensor:
         """
-        Forward pass for a dense layer! Refer to lecture slides for how this is computed.
+        Forward pass for a dense layer!
+        Refer to lecture slides for how this is computed.
         """
         weights, biases = self.weights
         return Tensor(np.dot(x, weights) + biases)
@@ -33,7 +34,7 @@ class Dense(Diffable):
         grad_output = self.get_input_gradients()
 
         grad_weights = np.dot(inputs, grad_output[0])
-        bias = np.ones_like(self.b)
+        bias = self.weights[1]
         return [Tensor(grad_weights), Tensor(bias)]
 
     @staticmethod
