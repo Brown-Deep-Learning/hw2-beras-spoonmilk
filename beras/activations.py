@@ -18,8 +18,8 @@ class LeakyReLU(Activation):
     # TODO: Implement for default intermediate activation.
 
     def __init__(self, alpha=0.3):
-        self.alpha = alpha
-
+       self.alpha = alpha
+       
     def forward(self, x) -> Tensor:
         """Leaky ReLu forward propagation!"""
         # This is disgusting and bad and I hate python
@@ -36,7 +36,7 @@ class LeakyReLU(Activation):
         return [Tensor(inputarr)]
 
     def compose_input_gradients(self, J):
-        return np.dot(self.get_input_gradients()[0] * J)
+        return self.get_input_gradients()[0] @ J
 
 
 class ReLU(LeakyReLU):
@@ -63,7 +63,7 @@ class Sigmoid(Activation):
         def sigmoid(x) -> Tensor:
             return 1 / (1 + np.exp(-x))
 
-        return [sigmoid(self.inputs) * (1 - sigmoid(self.inputs))]
+        return [np.dot(sigmoid(self.inputs), (1 - sigmoid(self.inputs)))]
 
     def compose_input_gradients(self, J):
         return self.get_input_gradients()[0] * J
